@@ -13,6 +13,7 @@ import (
 
 // AddLocation adds the user location
 func (s *Server) AddLocation(ctx context.Context, req *pb.AddLocationRequest) (*pb.AddLocationResponse, error) {
+	s.Log(fmt.Sprintf("Received location for %v", req.Location.Name))
 	ip, port, err := utils.Resolve("location")
 	if err != nil {
 		return &pb.AddLocationResponse{}, err
