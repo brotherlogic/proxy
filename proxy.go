@@ -59,7 +59,7 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 
-	server.RegisterServer("proxy", false)
+	server.RegisterServer("proxy", true)
 	server.Log("Starting!")
 	server.Serve()
 }
