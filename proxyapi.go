@@ -27,7 +27,7 @@ func (s *Server) AddLocation(ctx context.Context, req *pb.AddLocationRequest) (*
 	defer conn.Close()
 	c := pb.NewLocationServiceClient(conn)
 	lr, err := c.AddLocation(ctx, req)
-	if err != nil {
+	if err == nil {
 		s.loccount++
 	}
 	return lr, err
