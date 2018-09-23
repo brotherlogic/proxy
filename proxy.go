@@ -16,12 +16,14 @@ import (
 //Server main server type
 type Server struct {
 	*goserver.GoServer
+	loccount int64
 }
 
 // Init builds the server
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
+		0,
 	}
 	return s
 }
@@ -43,7 +45,9 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{}
+	return []*pbg.State{
+		&pbg.State{Key: "locations", Value: s.loccount},
+	}
 }
 
 func main() {

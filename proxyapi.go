@@ -26,7 +26,11 @@ func (s *Server) AddLocation(ctx context.Context, req *pb.AddLocationRequest) (*
 
 	defer conn.Close()
 	c := pb.NewLocationServiceClient(conn)
-	return c.AddLocation(ctx, req)
+	lr, err := c.AddLocation(ctx, req)
+	if err != nil {
+		s.loccount++
+	}
+	return lr, err
 }
 
 // GetLocation gets the most recent user location
