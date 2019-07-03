@@ -63,6 +63,7 @@ func (s *Server) GetState() []*pbg.State {
 }
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
+	s.githubcount++
 	entry, err := utils.GetMaster("githubcard")
 
 	if err != nil {
@@ -84,6 +85,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 	// combined for GET/POST
 	if err != nil {
+		s.Log(fmt.Sprintf("Error doing: %v", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
