@@ -71,7 +71,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entry.Ip, entry.Port), r.Body)
+	req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entry.Ip, entry.Port-1), r.Body)
 	for name, value := range r.Header {
 		req.Header.Set(name, value[0])
 	}
