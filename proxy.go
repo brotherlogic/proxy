@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,19 +13,22 @@ import (
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	"github.com/brotherlogic/goserver/utils"
 	pb "github.com/brotherlogic/location/proto"
 )
 
 //Server main server type
 type Server struct {
 	*goserver.GoServer
-	loccount int64
+	loccount    int64
+	githubcount int64
 }
 
 // Init builds the server
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
+		0,
 		0,
 	}
 	return s
@@ -54,11 +58,42 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
 		&pbg.State{Key: "locations", Value: s.loccount},
+		&pbg.State{Key: "githubs", Value: s.githubcount},
 	}
 }
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
-	s.Log(fmt.Sprintf("Got thing on http"))
+	entry, err := utils.GetMaster("githubcard")
+
+	if err != nil {
+		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v", err))
+		return
+	}
+
+	req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entry.Ip, entry.Port), r.Body)
+	for name, value := range r.Header {
+		req.Header.Set(name, value[0])
+	}
+	if err != nil {
+		s.Log(fmt.Sprintf("Unable to process request: %v", err))
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	r.Body.Close()
+
+	// combined for GET/POST
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for k, v := range resp.Header {
+		w.Header().Set(k, v[0])
+	}
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
+	resp.Body.Close()
 }
 
 func (s *Server) serveUp(port int32) {
