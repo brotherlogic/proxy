@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
@@ -55,6 +57,18 @@ func (s *Server) GetState() []*pbg.State {
 	}
 }
 
+func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
+	s.Log(fmt.Sprintf("Got thing on http"))
+}
+
+func (s *Server) serveUp(port int32) {
+	http.HandleFunc("/githubwebhook", s.githubwebhook)
+	err := http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
 	flag.Parse()
@@ -72,6 +86,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to register: %v", err)
 	}
+
+	// Handle web requests
+	go server.serveUp(server.Registry.Port - 1)
+
 	server.Log("Starting!")
 	server.Serve()
 }
