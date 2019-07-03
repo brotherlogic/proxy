@@ -63,7 +63,7 @@ func (s *Server) GetState() []*pbg.State {
 }
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
-	s.githubs++
+	s.githubcount++
 	entry, err := utils.GetMaster("githubcard")
 
 	if err != nil {
