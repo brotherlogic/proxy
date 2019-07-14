@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	pbft "github.com/brotherlogic/frametracker/proto"
 	pb "github.com/brotherlogic/location/proto"
 )
 
@@ -31,6 +32,19 @@ func (s *Server) AddLocation(ctx context.Context, req *pb.AddLocationRequest) (*
 		s.loccount++
 	}
 	return lr, err
+}
+
+// RecordStatus records status
+func (s *Server) RecordStatus(ctx context.Context, req *pbft.StatusRequest) (*pbft.StatusResponse, error) {
+	s.Log(fmt.Sprintf("Received status %v", req))
+	conn, err := s.DialMaster("frametracker")
+	if err != nil {
+		return &pbft.StatusResponse{}, err
+	}
+	defer conn.Close()
+
+	c := pbft.NewFrameTrackerServiceClient(conn)
+	return c.RecordStatus(ctx, req)
 }
 
 // GetLocation gets the most recent user location

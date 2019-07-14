@@ -9,11 +9,12 @@ import (
 	"net/http"
 
 	"github.com/brotherlogic/goserver"
+	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	pbft "github.com/brotherlogic/frametracker/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
-	"github.com/brotherlogic/goserver/utils"
 	pb "github.com/brotherlogic/location/proto"
 )
 
@@ -37,6 +38,7 @@ func Init() *Server {
 // DoRegister does RPC registration
 func (s *Server) DoRegister(server *grpc.Server) {
 	pb.RegisterLocationServiceServer(server, s)
+	pbft.RegisterFrameTrackerServiceServer(server, s)
 }
 
 // ReportHealth alerts if we're not healthy
