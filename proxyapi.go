@@ -2,11 +2,8 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 
-	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 
 	pbft "github.com/brotherlogic/frametracker/proto"
 	pb "github.com/brotherlogic/location/proto"
@@ -15,12 +12,7 @@ import (
 // AddLocation adds the user location
 func (s *Server) AddLocation(ctx context.Context, req *pb.AddLocationRequest) (*pb.AddLocationResponse, error) {
 	s.Log(fmt.Sprintf("Received location for %v", req.Location.Name))
-	ip, port, err := utils.Resolve("location")
-	if err != nil {
-		return &pb.AddLocationResponse{}, err
-	}
-
-	conn, err := grpc.Dial(ip+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	conn, err := s.DialMaster("location")
 	if err != nil {
 		return &pb.AddLocationResponse{}, err
 	}
