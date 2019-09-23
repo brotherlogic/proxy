@@ -128,7 +128,5 @@ func main() {
 
 	// Handle web requests
 	go server.serveUp(server.Registry.Port - 1)
-
-	server.Log("Starting!")
 	server.Serve()
 }
