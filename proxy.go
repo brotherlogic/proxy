@@ -121,7 +121,7 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 
-	err := server.RegisterServer("proxy", true)
+	err := server.RegisterServerV2("proxy", true)
 	if err != nil {
 		log.Fatalf("Unable to register: %v", err)
 	}
