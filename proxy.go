@@ -23,6 +23,7 @@ type Server struct {
 	*goserver.GoServer
 	loccount    int64
 	githubcount int64
+	githuberr   string
 }
 
 // Init builds the server
@@ -31,6 +32,7 @@ func Init() *Server {
 		&goserver.GoServer{},
 		0,
 		0,
+		"",
 	}
 	return s
 }
@@ -61,12 +63,13 @@ func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
 		&pbg.State{Key: "githubs", Value: s.githubcount},
 		&pbg.State{Key: "locations", Value: s.loccount},
+		&pbg.State{Key: "github_error", Text: s.githuberr},
 	}
 }
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	s.githubcount++
-	entry, err := utils.GetMaster("githubreceiver", "proxy-github")
+	entry, err := utils.ResolveV2("githubreceiver")
 
 	if err != nil {
 		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v", err))
