@@ -14,6 +14,7 @@ import (
 
 	pbft "github.com/brotherlogic/frametracker/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
+	"github.com/brotherlogic/goserver/utils"
 	pb "github.com/brotherlogic/location/proto"
 )
 
@@ -68,14 +69,14 @@ func (s *Server) GetState() []*pbg.State {
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	s.githubcount++
-	entry, err := s.DialMaster("githubreceiver")
+	entries, err := utils.ResolveV3("githubreceiver")
 
-	if err != nil {
-		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v", err))
+	if err != nil || len(entries) == 0 {
+		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
 		return
 	}
 
-	req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entry.Ip, entry.Port-1), r.Body)
+	req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entries[0].Ip, entries[0].Port-1), r.Body)
 	for name, value := range r.Header {
 		req.Header.Set(name, value[0])
 	}
@@ -123,7 +124,7 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 
-	err := server.RegisterServerV2("proxy", true)
+	err := server.RegisterServerV2("proxy", true, false)
 	if err != nil {
 		log.Fatalf("Unable to register: %v", err)
 	}
