@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	"github.com/brotherlogic/goserver"
-	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -69,7 +68,7 @@ func (s *Server) GetState() []*pbg.State {
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	s.githubcount++
-	entry, err := utils.ResolveV2("githubreceiver")
+	entry, err := s.DialMaster("githubreceiver")
 
 	if err != nil {
 		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v", err))
