@@ -88,12 +88,12 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 		client := &http.Client{}
 		resp, err := client.Do(req)
-		r.Body.Close()
 
 		// combined for GET/POST
 		if err != nil {
 			s.Log(fmt.Sprintf("Error doing: %v", err))
 		} else {
+			r.Body.Close()
 			for k, v := range resp.Header {
 				w.Header().Set(k, v[0])
 			}
