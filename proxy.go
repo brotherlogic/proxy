@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -76,8 +77,15 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	defer r.Body.Close()
+	bodyd, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		s.Log(fmt.Sprintf("Cannot read body: %v", err))
+	}
+
 	for _, entry := range entries {
-		req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entry.Ip, entry.Port-1), r.Body)
+
+		req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entry.Ip, entry.Port-1), bytes.NewReader(bodyd))
 		for name, value := range r.Header {
 			req.Header.Set(name, value[0])
 		}
@@ -93,7 +101,6 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			s.Log(fmt.Sprintf("Error doing: %v", err))
 		} else {
-			r.Body.Close()
 			for k, v := range resp.Header {
 				w.Header().Set(k, v[0])
 			}
