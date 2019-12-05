@@ -128,7 +128,7 @@ func main() {
 
 	err := server.RegisterServerV2("proxy", true, false)
 	if err != nil {
-		log.Fatalf("Unable to register: %v", err)
+		return
 	}
 
 	// Handle web requests
