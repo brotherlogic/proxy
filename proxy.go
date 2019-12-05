@@ -94,16 +94,15 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			s.Log(fmt.Sprintf("Error doing: %v", err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			break
+		} else {
+			for k, v := range resp.Header {
+				w.Header().Set(k, v[0])
+			}
+			w.WriteHeader(resp.StatusCode)
+			io.Copy(w, resp.Body)
+			resp.Body.Close()
+			return
 		}
-
-		for k, v := range resp.Header {
-			w.Header().Set(k, v[0])
-		}
-		w.WriteHeader(resp.StatusCode)
-		io.Copy(w, resp.Body)
-		resp.Body.Close()
-		return
 	}
 }
 
