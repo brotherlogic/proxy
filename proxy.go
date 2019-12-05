@@ -76,6 +76,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	s.Log(fmt.Sprintf("Found %v possible responders", len(entries)))
 	for _, entry := range entries {
 		req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entry.Ip, entry.Port-1), r.Body)
 		for name, value := range r.Header {
