@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
@@ -72,7 +73,11 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	s.githubcount++
 	entries, err := utils.ResolveV3("githubreceiver")
 
+	ctx, cancel := utils.ManualContext("proxy", "proxy-github", time.Minute)
+	defer cancel()
+
 	if err != nil || len(entries) == 0 {
+		s.RaiseIssue(ctx, "Unable to pass on web hook", fmt.Sprintf("%v %v", err, entries), false)
 		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
 		return
 	}
@@ -90,6 +95,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			req.Header.Set(name, value[0])
 		}
 		if err != nil {
+			s.RaiseIssue(ctx, "Unable to pass on web hook", fmt.Sprintf("%v", err), false)
 			s.Log(fmt.Sprintf("Unable to process request: %v", err))
 			break
 		}
@@ -99,6 +105,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 		// combined for GET/POST
 		if err != nil {
+			s.RaiseIssue(ctx, "Unable to pass on web hook", fmt.Sprintf("%v", err), false)
 			s.Log(fmt.Sprintf("Error doing: %v", err))
 		} else {
 			for k, v := range resp.Header {
