@@ -80,7 +80,6 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	if err != nil || len(entries) == 0 {
-		s.RaiseIssue(ctx, "Unable to pass on web hook", fmt.Sprintf("%v %v", err, entries), false)
 		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
 		return
 	}
@@ -98,7 +97,6 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			req.Header.Set(name, value[0])
 		}
 		if err != nil {
-			s.RaiseIssue(ctx, "Unable to pass on web hook", fmt.Sprintf("%v", err), false)
 			s.Log(fmt.Sprintf("Unable to process request: %v", err))
 			break
 		}
@@ -109,7 +107,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 		// combined for GET/POST
 		if err != nil {
-			s.RaiseIssue(ctx, "Unable to pass on web hook", fmt.Sprintf("%v", err), false)
+			s.RaiseIssue(ctx, "Unable to pass on web hook [2]", fmt.Sprintf("%v", err), false)
 			s.Log(fmt.Sprintf("Error doing: %v", err))
 		} else {
 			for k, v := range resp.Header {
