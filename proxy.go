@@ -26,7 +26,6 @@ type Server struct {
 	loccount    int64
 	githubcount int64
 	githuberr   string
-	githubbacks map[string]int
 }
 
 // Init builds the server
@@ -36,7 +35,6 @@ func Init() *Server {
 		0,
 		0,
 		"",
-		make(map[string]int),
 	}
 	return s
 }
@@ -65,7 +63,6 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
-		&pbg.State{Key: "github_backs", Text: fmt.Sprintf("%v", s.githubbacks)},
 		&pbg.State{Key: "githubs", Value: s.githubcount},
 		&pbg.State{Key: "locations", Value: s.loccount},
 		&pbg.State{Key: "github_error", Text: s.githuberr},
@@ -101,7 +98,6 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		s.githubbacks[entry.Ip]++
 		client := &http.Client{}
 		resp, err := client.Do(req)
 
