@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
@@ -72,9 +71,6 @@ func (s *Server) GetState() []*pbg.State {
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	s.githubcount++
 	entries, err := utils.ResolveV3("githubreceiver")
-
-	ctx, cancel := utils.ManualContext("proxy", "proxy-github", time.Minute, true)
-	defer cancel()
 
 	if err != nil || len(entries) == 0 {
 		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
