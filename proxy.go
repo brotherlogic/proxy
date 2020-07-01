@@ -73,7 +73,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	s.githubcount++
 	entries, err := utils.ResolveV3("githubreceiver")
 
-	ctx, cancel := utils.ManualContext("proxy", "proxy-github", time.Minute)
+	ctx, cancel := utils.ManualContext("proxy", "proxy-github", time.Minute, true)
 	defer cancel()
 
 	if err != nil || len(entries) == 0 {
@@ -103,7 +103,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 		// combined for GET/POST
 		if err != nil {
-			s.RaiseIssue(ctx, "Unable to pass on web hook [2]", fmt.Sprintf("%v", err), false)
+			s.RaiseIssue("Unable to pass on web hook [2]", fmt.Sprintf("%v", err))
 			s.Log(fmt.Sprintf("Error doing: %v", err))
 		} else {
 			for k, v := range resp.Header {
