@@ -138,7 +138,7 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 
-	err := server.RegisterServerV2("proxy", true, false)
+	err := server.RegisterServerV2("proxy", true, true)
 	if err != nil {
 		return
 	}
