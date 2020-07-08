@@ -8,6 +8,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
@@ -68,7 +71,9 @@ func (s *Server) GetState() []*pbg.State {
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	s.githubcount++
-	entries, err := utils.ResolveV3("githubreceiver")
+	ctx, cancel := utils.ManualContext("githubweb", "githubweb", time.Minute, true)
+	entries, err := utils.LFFind(ctx, "githubreceiver")
+	cancel()
 
 	if err != nil || len(entries) == 0 {
 		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
@@ -81,15 +86,22 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		s.Log(fmt.Sprintf("Cannot read body: %v", err))
 	}
 
+	// Fanout
 	for _, entry := range entries {
+		elems := strings.Split(entry, ":")
+		port, err := strconv.Atoi(elems[1])
+		if err != nil {
+			s.Log(fmt.Sprintf("Bad read: %v -> %v (%v)", err, elems[1], entry))
+			continue
+		}
 
-		req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", entry.Ip, entry.Port-1), bytes.NewReader(bodyd))
+		req, err := http.NewRequest(r.Method, fmt.Sprintf("http://%v:%v/githubwebhook", elems[0], port-1), bytes.NewReader(bodyd))
 		for name, value := range r.Header {
 			req.Header.Set(name, value[0])
 		}
 		if err != nil {
 			s.Log(fmt.Sprintf("Unable to process request: %v", err))
-			break
+			continue
 		}
 
 		client := &http.Client{}
@@ -106,7 +118,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(resp.StatusCode)
 			io.Copy(w, resp.Body)
 			resp.Body.Close()
-			return
+			continue
 		}
 	}
 }
