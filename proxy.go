@@ -141,6 +141,7 @@ func main() {
 		log.SetOutput(ioutil.Discard)
 	}
 	server := Init()
+	server.DiskLog = true
 	server.PrepServer()
 	server.Register = server
 
