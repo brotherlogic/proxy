@@ -77,6 +77,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil || len(entries) == 0 {
 		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
+
 		return
 	}
 
@@ -118,6 +119,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(resp.StatusCode)
 			io.Copy(w, resp.Body)
 			resp.Body.Close()
+			s.Log(fmt.Sprintf("Written hook to %v", entry))
 			continue
 		}
 	}
