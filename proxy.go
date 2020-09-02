@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/brotherlogic/goserver"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -69,6 +71,13 @@ func (s *Server) GetState() []*pbg.State {
 	}
 }
 
+var (
+	hook = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "proxy_ghwhook",
+		Help: "Push Size",
+	}, []string{"error"})
+)
+
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	s.githubcount++
 	ctx, cancel := utils.ManualContext("githubweb", "githubweb", time.Minute, true)
@@ -76,6 +85,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	cancel()
 
 	if err != nil || len(entries) == 0 {
+		hook.With(prometheus.Labels{"error": "resolve"}).Inc()
 		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
 
 		return
@@ -84,6 +94,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	bodyd, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		hook.With(prometheus.Labels{"error": "bodyread"}).Inc()
 		s.Log(fmt.Sprintf("Cannot read body: %v", err))
 	}
 
@@ -92,6 +103,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		elems := strings.Split(entry, ":")
 		port, err := strconv.Atoi(elems[1])
 		if err != nil {
+			hook.With(prometheus.Labels{"error": "badread"}).Inc()
 			s.Log(fmt.Sprintf("Bad read: %v -> %v (%v)", err, elems[1], entry))
 			continue
 		}
@@ -101,6 +113,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			req.Header.Set(name, value[0])
 		}
 		if err != nil {
+			hook.With(prometheus.Labels{"error": "process"}).Inc()
 			s.Log(fmt.Sprintf("Unable to process request: %v", err))
 			continue
 		}
@@ -110,6 +123,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 		// combined for GET/POST
 		if err != nil {
+			hook.With(prometheus.Labels{"error": "pass"}).Inc()
 			s.RaiseIssue("Unable to pass on web hook [2]", fmt.Sprintf("%v", err))
 			s.Log(fmt.Sprintf("Error doing: %v", err))
 		} else {
