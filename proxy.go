@@ -99,6 +99,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fanout
+	first := false
 	for _, entry := range entries {
 		elems := strings.Split(entry, ":")
 		port, err := strconv.Atoi(elems[1])
@@ -130,7 +131,10 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			for k, v := range resp.Header {
 				w.Header().Set(k, v[0])
 			}
-			w.WriteHeader(resp.StatusCode)
+			if first {
+				w.WriteHeader(resp.StatusCode)
+				first = false
+			}
 			io.Copy(w, resp.Body)
 			resp.Body.Close()
 			s.Log(fmt.Sprintf("Written hook to %v", entry))
