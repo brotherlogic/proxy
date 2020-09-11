@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package proxy;
+
+option go_package = "github.com/brotherlogic/proxy/proto";
+
+message GithubKey {
+  string key = 1;
+}
