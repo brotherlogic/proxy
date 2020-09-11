@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"io"
@@ -97,6 +99,13 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		hook.With(prometheus.Labels{"error": "bodyread"}).Inc()
 		s.Log(fmt.Sprintf("Cannot read body: %v", err))
 	}
+
+	//Validate the webhook before fannin
+	mac := hmac.New(sha256.New, []byte("madeupkey"))
+	mac.Write(bodyd)
+	expectedMAC := mac.Sum(nil)
+	signature := fmt.Sprintf("sha1=%v", expectedMAC)
+	s.Log(fmt.Sprintf("Found signature %v vs %v", signature, r.Header.Get("X-Hub-Signature")))
 
 	// Fanout
 	first := false
