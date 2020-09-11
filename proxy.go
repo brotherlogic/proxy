@@ -24,6 +24,7 @@ import (
 	pbg "github.com/brotherlogic/goserver/proto"
 	"github.com/brotherlogic/goserver/utils"
 	pb "github.com/brotherlogic/location/proto"
+	ppb "github.com/brotherlogic/proxy/proto"
 )
 
 //Server main server type
@@ -32,6 +33,7 @@ type Server struct {
 	loccount    int64
 	githubcount int64
 	githuberr   string
+	githubKey   string
 }
 
 // Init builds the server
@@ -40,6 +42,7 @@ func Init() *Server {
 		&goserver.GoServer{},
 		0,
 		0,
+		"",
 		"",
 	}
 	return s
@@ -81,6 +84,20 @@ var (
 )
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	bodyd, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		hook.With(prometheus.Labels{"error": "bodyread"}).Inc()
+		s.Log(fmt.Sprintf("Cannot read body: %v", err))
+	}
+
+	//Validate the webhook before fannin
+	mac := hmac.New(sha256.New, []byte(s.githubKey))
+	mac.Write(bodyd)
+	expectedMAC := mac.Sum(nil)
+	signature := fmt.Sprintf("sha1=%v", string(expectedMAC))
+	s.Log(fmt.Sprintf("Found signature %v vs %v", signature, r.Header.Get("X-Hub-Signature")))
+
 	s.githubcount++
 	ctx, cancel := utils.ManualContext("githubweb", "githubweb", time.Minute, true)
 	entries, err := utils.LFFind(ctx, "githubreceiver")
@@ -92,20 +109,6 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	defer r.Body.Close()
-	bodyd, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		hook.With(prometheus.Labels{"error": "bodyread"}).Inc()
-		s.Log(fmt.Sprintf("Cannot read body: %v", err))
-	}
-
-	//Validate the webhook before fannin
-	mac := hmac.New(sha256.New, []byte("madeupkey"))
-	mac.Write(bodyd)
-	expectedMAC := mac.Sum(nil)
-	signature := fmt.Sprintf("sha1=%v", expectedMAC)
-	s.Log(fmt.Sprintf("Found signature %v vs %v", signature, r.Header.Get("X-Hub-Signature")))
 
 	// Fanout
 	first := false
@@ -178,6 +181,17 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	ctx, cancel := utils.ManualContext("githubs", "githubs", time.Minute, true)
+	m, _, err := server.Read(ctx, "/github.com/brotherlogic/github/secret", &ppb.GithubKey{})
+	if err != nil {
+		log.Fatalf("Error reading token: %v", err)
+	}
+	cancel()
+	if len(m.(*ppb.GithubKey).GetKey()) == 0 {
+		log.Fatalf("Error reading key: %v", m)
+	}
+	server.githubKey = m.(*ppb.GithubKey).GetKey()
 
 	// Handle web requests
 	go server.serveUp(server.Registry.Port - 1)
