@@ -113,6 +113,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 	// Fanout
 	first := false
+	s.Log(fmt.Sprintf("FANNING OUT TO %v", entries))
 	for _, entry := range entries {
 		elems := strings.Split(entry, ":")
 		port, err := strconv.Atoi(elems[1])
