@@ -95,7 +95,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	mac := hmac.New(sha256.New, []byte(s.githubKey))
 	mac.Write(bodyd)
 	expectedMAC := mac.Sum(nil)
-	signature := fmt.Sprintf("sha1=%v", string(expectedMAC))
+	signature := fmt.Sprintf("sha1=%x", string(expectedMAC))
 	time.Sleep(time.Second * 2)
 	s.Log(fmt.Sprintf("Found signature %v", signature == r.Header.Get("X-Hub-Signature")))
 
