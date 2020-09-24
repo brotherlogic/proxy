@@ -97,7 +97,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	expectedMAC := mac.Sum(nil)
 	signature := fmt.Sprintf("sha1=%v", string(expectedMAC))
 	time.Sleep(time.Second * 2)
-	s.Log(fmt.Sprintf("Found signature %s vs %s -> %v", signature, r.Header.Get("X-Hub-Signature"), signature == r.Header.Get("X-Hub-Signature")))
+	s.Log(fmt.Sprintf("Found signature %v", signature == r.Header.Get("X-Hub-Signature")))
 
 	s.githubcount++
 	ctx, cancel := utils.ManualContext("githubweb", "githubweb", time.Minute, true)
