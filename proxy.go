@@ -99,6 +99,11 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(time.Second * 2)
 	s.Log(fmt.Sprintf("Found signature (%v) %v", s.githubKey, signature == r.Header.Get("X-Hub-Signature")))
 
+	if signature != r.Header.Get("X-Hub-Signature") {
+		s.RaiseIssue("Bad Signature", fmt.Sprintf("%v did not match the expected signature", string(bodyd)))
+		return
+	}
+
 	s.githubcount++
 	ctx, cancel := utils.ManualContext("githubweb", "githubweb", time.Minute, true)
 	entries, err := utils.LFFind(ctx, "githubreceiver")
