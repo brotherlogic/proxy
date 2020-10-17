@@ -200,6 +200,7 @@ func main() {
 		log.Fatalf("Error reading key: %v", m)
 	}
 	server.githubKey = m.(*ppb.GithubKey).GetKey()
+	server.Log(fmt.Sprintf("FUND KEY: %v", server.githubKey))
 
 	// Handle web requests
 	go server.serveUp(server.Registry.Port - 1)
