@@ -97,7 +97,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	signature := fmt.Sprintf("sha1=%x", string(expectedMAC))
 
 	if signature != r.Header.Get("X-Hub-Signature") {
-		s.Log(fmt.Sprintf("%v vs %v", len(signature), len(r.Header.Get("X-Hub-Signature"))))
+		s.Log(fmt.Sprintf("%v vs %v from %v", len(signature), len(r.Header.Get("X-Hub-Signature")), s.githubKey))
 		hook.With(prometheus.Labels{"error": "signature"}).Inc()
 		s.RaiseIssue("Bad Signature", fmt.Sprintf("%v did not match the expected signature", string(bodyd)))
 		return
