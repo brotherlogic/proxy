@@ -158,6 +158,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			io.Copy(w, resp.Body)
 			resp.Body.Close()
 			s.Log(fmt.Sprintf("Written hook to %v", entry))
+			hook.With(prometheus.Labels{"error": "nil"}).Inc()
 			continue
 		}
 	}
