@@ -84,6 +84,7 @@ var (
 )
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
+	hook.With(prometheus.Labels{"error": "received"}).Inc()
 	defer r.Body.Close()
 	bodyd, err := ioutil.ReadAll(r.Body)
 	if err != nil {
