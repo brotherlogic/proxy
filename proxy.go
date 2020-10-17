@@ -95,10 +95,9 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	mac.Write(bodyd)
 	expectedMAC := mac.Sum(nil)
 	signature := fmt.Sprintf("sha1=%x", string(expectedMAC))
-	time.Sleep(time.Second * 2)
-	s.Log(fmt.Sprintf("Found signature (%v) %v", s.githubKey, signature == r.Header.Get("X-Hub-Signature")))
 
 	if signature != r.Header.Get("X-Hub-Signature") {
+		s.Log(fmt.Sprintf("%v vs %v", len(signature), len(r.Header.Get("X-Hub-Signature"))))
 		hook.With(prometheus.Labels{"error": "signature"}).Inc()
 		s.RaiseIssue("Bad Signature", fmt.Sprintf("%v did not match the expected signature", string(bodyd)))
 		return
@@ -200,7 +199,6 @@ func main() {
 		log.Fatalf("Error reading key: %v", m)
 	}
 	server.githubKey = m.(*ppb.GithubKey).GetKey()
-	server.Log(fmt.Sprintf("FUND KEY: %v", server.githubKey))
 
 	// Handle web requests
 	go server.serveUp(server.Registry.Port - 1)
