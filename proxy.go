@@ -71,9 +71,7 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{
-		&pbg.State{Key: "yep", Value: int64(8)},
-	}
+	return []*pbg.State{}
 }
 
 var (
@@ -97,10 +95,9 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	mac.Write(bodyd)
 	expectedMAC := mac.Sum(nil)
 	signature := fmt.Sprintf("sha1=%x", string(expectedMAC))
-	time.Sleep(time.Second * 2)
-	s.Log(fmt.Sprintf("Found signature (%v) %v", s.githubKey, signature == r.Header.Get("X-Hub-Signature")))
 
 	if signature != r.Header.Get("X-Hub-Signature") {
+		s.Log(fmt.Sprintf("%v vs %v", len(signature), len(r.Header.Get("X-Hub-Signature"))))
 		hook.With(prometheus.Labels{"error": "signature"}).Inc()
 		s.RaiseIssue("Bad Signature", fmt.Sprintf("%v did not match the expected signature", string(bodyd)))
 		return
