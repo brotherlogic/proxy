@@ -85,7 +85,6 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	hook.With(prometheus.Labels{"error": "received"}).Inc()
 	defer r.Body.Close()
 	bodyd, err := ioutil.ReadAll(r.Body)
-	s.Log(fmt.Sprintf("INIITAL BODY %v", string(bodyd)))
 	if err != nil {
 		hook.With(prometheus.Labels{"error": "bodyread"}).Inc()
 		s.Log(fmt.Sprintf("Cannot read body: %v", err))
@@ -105,7 +104,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.githubcount++
-	ctx, cancel := utils.ManualContext("githubweb", "githubweb", time.Minute, true)
+	ctx, cancel := utils.ManualContext("githubweb", time.Minute)
 	entries, err := utils.LFFind(ctx, "githubreceiver")
 	cancel()
 
@@ -118,7 +117,6 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 	// Fanout
 	first := false
-	s.Log(fmt.Sprintf("FANNING OUT TO %v", entries))
 	for _, entry := range entries {
 		elems := strings.Split(entry, ":")
 		port, err := strconv.Atoi(elems[1])
@@ -190,7 +188,7 @@ func main() {
 		return
 	}
 
-	ctx, cancel := utils.ManualContext("githubs", "githubs", time.Minute, true)
+	ctx, cancel := utils.ManualContext("githubs", time.Minute)
 	m, _, err := server.Read(ctx, "/github.com/brotherlogic/github/secret", &ppb.GithubKey{})
 	if err != nil {
 		log.Fatalf("Error reading token: %v", err)
