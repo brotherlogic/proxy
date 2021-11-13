@@ -117,6 +117,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 
 	// Fanout
 	first := false
+	s.Log(fmt.Sprintf("FANNING OUT TO %v", entries))
 	for _, entry := range entries {
 		elems := strings.Split(entry, ":")
 		port, err := strconv.Atoi(elems[1])
@@ -191,11 +192,11 @@ func main() {
 	ctx, cancel := utils.ManualContext("githubs", time.Minute)
 	m, _, err := server.Read(ctx, "/github.com/brotherlogic/github/secret", &ppb.GithubKey{})
 	if err != nil {
-		log.Fatalf("error reading token: %v", err)
+		log.Fatalf("Error reading token: %v", err)
 	}
 	cancel()
 	if len(m.(*ppb.GithubKey).GetKey()) == 0 {
-		log.Fatalf("error reading key: %v", m)
+		log.Fatalf("Error reading key: %v", m)
 	}
 	server.githubKey = m.(*ppb.GithubKey).GetKey()
 
