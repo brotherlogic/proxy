@@ -202,5 +202,8 @@ func main() {
 
 	// Handle web requests
 	go server.serveUp(server.Registry.Port - 1)
+
+	server.RaiseIssue("Found IP", fmt.Sprintf("Found our IP: %v", server.Registry.Ip))
+
 	server.Serve()
 }
