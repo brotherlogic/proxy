@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -203,7 +204,8 @@ func main() {
 	// Handle web requests
 	go server.serveUp(server.Registry.Port - 1)
 
-	server.RaiseIssue("Found IP", fmt.Sprintf("Found our IP: %v", server.Registry.Ip))
+	output, err := exec.Command("uptime").CombinedOutput()
+	server.RaiseIssue("Found IP", fmt.Sprintf("Found our IP: %v -> %v", server.Registry.Ip, string(output)))
 
 	server.Serve()
 }
