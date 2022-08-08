@@ -182,10 +182,10 @@ func main() {
 	}
 	server := Init()
 	server.DiskLog = true
-	server.PrepServer()
+	server.PrepServer("proxy")
 	server.Register = server
 
-	err := server.RegisterServerV2("proxy", true, true)
+	err := server.RegisterServerV2(true)
 	if err != nil {
 		return
 	}
