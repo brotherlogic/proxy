@@ -10,8 +10,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -105,8 +105,8 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.githubcount++
-	ctx, cancel := utils.ManualContext("githubweb", time.Minute)
-	entries, err := utils.LFFind(ctx, "githubreceiver")
+	ctx, cancel := utils.ManualContext("githubweb-fanout", time.Minute)
+	entries, err := s.FFind(ctx, "githubreceiver")
 	cancel()
 
 	if err != nil || len(entries) == 0 {
