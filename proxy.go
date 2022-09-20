@@ -83,12 +83,14 @@ var (
 )
 
 func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := utils.ManualContext("githubweb-fanout", time.Minute)
+
 	hook.With(prometheus.Labels{"error": "received"}).Inc()
 	defer r.Body.Close()
 	bodyd, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		hook.With(prometheus.Labels{"error": "bodyread"}).Inc()
-		s.Log(fmt.Sprintf("Cannot read body: %v", err))
+		s.CtxLog(ctx, fmt.Sprintf("Cannot read body: %v", err))
 	}
 
 	//Validate the webhook before fannin
@@ -98,33 +100,33 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	signature := fmt.Sprintf("sha1=%x", string(expectedMAC))
 
 	if signature != r.Header.Get("X-Hub-Signature") {
-		s.Log(fmt.Sprintf("%v = %v vs %v from %v", r.Header.Get("X-Hub-Signature"), len(signature), len(r.Header.Get("X-Hub-Signature")), s.githubKey))
+		s.CtxLog(ctx, fmt.Sprintf("%v = %v vs %v from %v", r.Header.Get("X-Hub-Signature"), len(signature), len(r.Header.Get("X-Hub-Signature")), s.githubKey))
 		hook.With(prometheus.Labels{"error": "signature"}).Inc()
 		s.RaiseIssue("Bad Signature", fmt.Sprintf("%v did not match the expected signature", string(bodyd)))
 		return
 	}
 
 	s.githubcount++
-	ctx, cancel := utils.ManualContext("githubweb-fanout", time.Minute)
+
 	entries, err := s.FFind(ctx, "githubreceiver")
 	cancel()
 
 	if err != nil || len(entries) == 0 {
 		hook.With(prometheus.Labels{"error": "resolve"}).Inc()
-		s.Log(fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
+		s.CtxLog(ctx, fmt.Sprintf("Unable to resolve githubcard: %v -> %v", err, entries))
 
 		return
 	}
 
 	// Fanout
 	first := false
-	s.Log(fmt.Sprintf("FANNING OUT TO %v", entries))
+	s.CtxLog(ctx, fmt.Sprintf("FANNING OUT TO %v", entries))
 	for _, entry := range entries {
 		elems := strings.Split(entry, ":")
 		port, err := strconv.Atoi(elems[1])
 		if err != nil {
 			hook.With(prometheus.Labels{"error": "badread"}).Inc()
-			s.Log(fmt.Sprintf("Bad read: %v -> %v (%v)", err, elems[1], entry))
+			s.CtxLog(ctx, fmt.Sprintf("Bad read: %v -> %v (%v)", err, elems[1], entry))
 			continue
 		}
 
@@ -134,7 +136,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		}
 		if err != nil {
 			hook.With(prometheus.Labels{"error": "process"}).Inc()
-			s.Log(fmt.Sprintf("Unable to process request: %v", err))
+			s.CtxLog(ctx, fmt.Sprintf("Unable to process request: %v", err))
 			continue
 		}
 
@@ -145,7 +147,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			hook.With(prometheus.Labels{"error": "pass"}).Inc()
 			s.RaiseIssue("Unable to pass on web hook [2]", fmt.Sprintf("%v", err))
-			s.Log(fmt.Sprintf("Error doing: %v", err))
+			s.CtxLog(ctx, fmt.Sprintf("Error doing: %v", err))
 		} else {
 			for k, v := range resp.Header {
 				w.Header().Set(k, v[0])
@@ -156,7 +158,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			}
 			io.Copy(w, resp.Body)
 			resp.Body.Close()
-			s.Log(fmt.Sprintf("Written hook to %v", entry))
+			s.CtxLog(ctx, fmt.Sprintf("Written hook to %v", entry))
 			hook.With(prometheus.Labels{"error": "nil"}).Inc()
 			continue
 		}
