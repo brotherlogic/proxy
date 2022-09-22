@@ -178,6 +178,7 @@ func (s *Server) shutdown(w http.ResponseWriter, r *http.Request) {
 			conn, err := utils.LFDialSpecificServer(ctx, "gobuildslave", fmt.Sprintf("clust%v", val))
 			if err != nil {
 				s.CtxLog(ctx, fmt.Sprintf("Cannot dial gbs: %v", err))
+				return
 			}
 			gbsclient := gbspb.NewBuildSlaveClient(conn)
 			gbsclient.FullShutdown(ctx, &gbspb.ShutdownRequest{})
