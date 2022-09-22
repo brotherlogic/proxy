@@ -175,7 +175,7 @@ func (s *Server) shutdown(w http.ResponseWriter, r *http.Request) {
 	for i := 1; i <= 8; i++ {
 		wg.Add(1)
 		go func(val int) {
-			conn, err := utils.LFDialSpecificServer(ctx, "gobuildslave", fmt.Sprintf("clust%v", i))
+			conn, err := utils.LFDialSpecificServer(ctx, "gobuildslave", fmt.Sprintf("clust%v", val))
 			if err != nil {
 				s.CtxLog(ctx, fmt.Sprintf("Cannot dial gbs: %v", err))
 			}
