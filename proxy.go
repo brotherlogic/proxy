@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/brotherlogic/goserver"
@@ -170,15 +171,19 @@ func (s *Server) shutdown(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := utils.ManualContext("proxy-shutdown", time.Minute*10)
 	defer cancel()
 
-	for i := 1; i <= 1; i++ {
-		conn, err := utils.LFDialSpecificServer(ctx, "gobuildslave", fmt.Sprintf("clust%v", i))
-		if err != nil {
-			s.CtxLog(ctx, fmt.Sprintf("Cannot dial gbs: %v", err))
-			continue
-		}
-		gbsclient := gbspb.NewBuildSlaveClient(conn)
-		gbsclient.FullShutdown(ctx, &gbspb.ShutdownRequest{})
+	wg := &sync.WaitGroup{}
+	for i := 1; i <= 8; i++ {
+		wg.Add(1)
+		go func(val int) {
+			conn, err := utils.LFDialSpecificServer(ctx, "gobuildslave", fmt.Sprintf("clust%v", i))
+			if err != nil {
+				s.CtxLog(ctx, fmt.Sprintf("Cannot dial gbs: %v", err))
+			}
+			gbsclient := gbspb.NewBuildSlaveClient(conn)
+			gbsclient.FullShutdown(ctx, &gbspb.ShutdownRequest{})
+		}(i)
 	}
+	wg.Wait()
 }
 
 func (s *Server) serveUp(port int32) {
