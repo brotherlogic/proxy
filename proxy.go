@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc"
 
 	pbft "github.com/brotherlogic/frametracker/proto"
+	gbspb "github.com/brotherlogic/gobuildslave/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
 	"github.com/brotherlogic/goserver/utils"
 	pb "github.com/brotherlogic/location/proto"
@@ -165,8 +166,24 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) shutdown(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := utils.ManualContext("proxy-shutdown", time.Minute*10)
+	defer cancel()
+
+	for i := 1; i <= 1; i++ {
+		conn, err := utils.LFDialSpecificServer(ctx, "gobuildslave", fmt.Sprintf("clust%v", i))
+		if err != nil {
+			s.CtxLog(ctx, fmt.Sprintf("Cannot dial gbs: %v", err))
+			continue
+		}
+		gbsclient := gbspb.NewBuildSlaveClient(conn)
+		gbsclient.FullShutdown(ctx, &gbspb.ShutdownRequest{})
+	}
+}
+
 func (s *Server) serveUp(port int32) {
 	http.HandleFunc("/githubwebhook", s.githubwebhook)
+	http.HandleFunc("/shutdown", s.shutdown)
 	err := http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 	if err != nil {
 		panic(err)
