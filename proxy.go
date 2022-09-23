@@ -171,6 +171,8 @@ func (s *Server) shutdown(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := utils.ManualContext("proxy-shutdown", time.Minute*10)
 	defer cancel()
 
+	s.CtxLog(ctx, "Shutting down the cluster")
+
 	wg := &sync.WaitGroup{}
 	for i := 1; i <= 8; i++ {
 		wg.Add(1)
