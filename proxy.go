@@ -183,10 +183,12 @@ func (s *Server) shutdown(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			gbsclient := gbspb.NewBuildSlaveClient(conn)
-			gbsclient.FullShutdown(ctx, &gbspb.ShutdownRequest{})
+			_, err = gbsclient.FullShutdown(ctx, &gbspb.ShutdownRequest{})
+			s.CtxLog(ctx, fmt.Sprintf("Shutdown clust%v -> %v", val, err))
 		}(i)
 	}
 	wg.Wait()
+	s.CtxLog(ctx, "Shutdown complete")
 }
 
 func (s *Server) serveUp(port int32) {
