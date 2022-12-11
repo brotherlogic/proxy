@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/brotherlogic/frametracker v0.0.0-20221203203946-d3d2b874ba1c
+	github.com/brotherlogic/githubcard v0.0.0-20221210201915-2f340042d948 // indirect
 	github.com/brotherlogic/gobuildslave v0.0.0-20221210200228-ef727a7dcab2
 	github.com/brotherlogic/goserver v0.0.0-20221202193151-b0b39691c212
 	github.com/brotherlogic/location v0.0.0-20200818030042-5fd88850d466
