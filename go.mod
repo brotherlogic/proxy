@@ -3,9 +3,9 @@ module github.com/brotherlogic/proxy
 go 1.16
 
 require (
-	github.com/brotherlogic/dstore v0.0.0-20221218055338-99a21b17382c // indirect
-	github.com/brotherlogic/frametracker v0.0.0-20221218041510-3c364a741ad8
-	github.com/brotherlogic/gobuildslave v0.0.0-20221218021644-eee25e8e2c8b
+	github.com/brotherlogic/frametracker v0.0.0-20221225053910-6a9d1c8034f8
+	github.com/brotherlogic/githubcard v0.0.0-20221225061950-72e65b7bbe7b // indirect
+	github.com/brotherlogic/gobuildslave v0.0.0-20221225055807-42396db74074
 	github.com/brotherlogic/goserver v0.0.0-20221217002224-0ba5c0213be1
 	github.com/brotherlogic/location v0.0.0-20200818030042-5fd88850d466
 	github.com/golang/protobuf v1.5.2
