@@ -30,7 +30,7 @@ import (
 	ppb "github.com/brotherlogic/proxy/proto"
 )
 
-//Server main server type
+// Server main server type
 type Server struct {
 	*goserver.GoServer
 	loccount    int64
@@ -148,7 +148,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		// combined for GET/POST
 		if err != nil {
 			hook.With(prometheus.Labels{"error": "pass"}).Inc()
-			s.RaiseIssue("Unable to pass on web hook [2]", fmt.Sprintf("%v", err))
+			s.RaiseIssue("Unable to pass on web hook", fmt.Sprintf("%v", err))
 			s.CtxLog(ctx, fmt.Sprintf("Error doing: %v", err))
 		} else {
 			for k, v := range resp.Header {
@@ -160,7 +160,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 			}
 			io.Copy(w, resp.Body)
 			resp.Body.Close()
-			s.CtxLog(ctx, fmt.Sprintf("Written hook to %v", entry))
+			s.CtxLog(ctx, fmt.Sprintf("written hook to %v", entry))
 			hook.With(prometheus.Labels{"error": "nil"}).Inc()
 			continue
 		}
@@ -171,7 +171,7 @@ func (s *Server) shutdown(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := utils.ManualContext("proxy-shutdown", time.Minute*10)
 	defer cancel()
 
-	s.CtxLog(ctx, "Shutting down the cluster")
+	s.CtxLog(ctx, "shutting down the cluster")
 
 	wg := &sync.WaitGroup{}
 	for i := 1; i <= 8; i++ {
