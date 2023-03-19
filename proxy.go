@@ -148,7 +148,7 @@ func (s *Server) githubwebhook(w http.ResponseWriter, r *http.Request) {
 		// combined for GET/POST
 		if err != nil {
 			hook.With(prometheus.Labels{"error": "pass"}).Inc()
-			s.RaiseIssue("Unable to pass on web hook [2]", fmt.Sprintf("%v", err))
+			s.RaiseIssue("Unable to pass on web hook", fmt.Sprintf("%v", err))
 			s.CtxLog(ctx, fmt.Sprintf("Error doing: %v", err))
 		} else {
 			for k, v := range resp.Header {
