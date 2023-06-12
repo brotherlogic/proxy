@@ -3,6 +3,7 @@ module github.com/brotherlogic/proxy
 go 1.16
 
 require (
+	github.com/brotherlogic/buildserver v0.0.0-20230610183004-84db4ad05cd8 // indirect
 	github.com/brotherlogic/frametracker v0.0.0-20230108072501-6f46530d65e2
 	github.com/brotherlogic/gobuildslave v0.0.0-20230604044345-1e331dee389b
 	github.com/brotherlogic/goserver v0.0.0-20230530030554-6cec644064c2
