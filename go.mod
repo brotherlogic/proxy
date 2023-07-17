@@ -7,7 +7,7 @@ require (
 	github.com/brotherlogic/gobuildslave v0.0.0-20230604044345-1e331dee389b
 	github.com/brotherlogic/goserver v0.0.0-20230619155835-969c746dba11
 	github.com/brotherlogic/location v0.0.0-20200818030042-5fd88850d466
-	github.com/brotherlogic/lock v0.0.0-20230710100859-366242dc6c96 // indirect
+	github.com/brotherlogic/lock v0.0.0-20230717105329-6fd609e09b6a // indirect
 	github.com/golang/protobuf v1.5.3
 	github.com/prometheus/client_golang v1.16.0
 	golang.org/x/net v0.12.0
