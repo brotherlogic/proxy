@@ -2084,8 +2084,9 @@ github.com/brotherlogic/frametracker v0.0.0-20231103181248-f59c9174ce53/go.mod h
 github.com/brotherlogic/frametracker v0.0.0-20231110182714-58f1c0ca2624/go.mod h1:XedwBJDYj1VYK06O+l6vI74AecWMym9TuDQMF5nVzJA=
 github.com/brotherlogic/frametracker v0.0.0-20231118033812-9a6548b010ad/go.mod h1:eL7Wh/la0788mCLgdQHSLp09HRTN7X9Hx3exV4fFxAA=
 github.com/brotherlogic/frametracker v0.0.0-20231127014149-1d0d293db346/go.mod h1:sAZSZb8o9VKOmII6+Eii4yVX0XPZDzHyzlO7QRxP5lk=
-github.com/brotherlogic/frametracker v0.0.0-20231204020135-9a173106b5d8 h1:ufjCgp3rFMtkDKmPiFr7Ip+Y72APhouwQc5E6VAqz3Y=
 github.com/brotherlogic/frametracker v0.0.0-20231204020135-9a173106b5d8/go.mod h1:ik2003uFxeIItUaDVPWqwevdV7vd5aHIR/88SO8LyQQ=
+github.com/brotherlogic/frametracker v0.0.0-20231206171636-82984f22691e h1:W4DLa9L3gV85t2dawlWmfknQcqUBtpOelMBM9kYKX5Q=
+github.com/brotherlogic/frametracker v0.0.0-20231206171636-82984f22691e/go.mod h1:HEActdlqvCP8C2uGlaOBox3On3i2Z4tlelurs9AyGYo=
 github.com/brotherlogic/githubcard v0.0.0-20201205192049-f6e63a2a7d72/go.mod h1:sclDi4PaEwqPve09abFGKqoW/wpUCI08yRQG7sEt+6Y=
 github.com/brotherlogic/githubcard v0.0.0-20210604235349-92e6a170b0c1/go.mod h1:Um+WsbJRbW/jl05doZpK7n/u3JJc10QIBoZRboT6QQQ=
 github.com/brotherlogic/githubcard v0.0.0-20210605220659-bcab63e76782/go.mod h1:Um+WsbJRbW/jl05doZpK7n/u3JJc10QIBoZRboT6QQQ=
