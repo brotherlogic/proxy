@@ -232,9 +232,5 @@ func main() {
 	// Handle web requests
 	go server.serveUp(server.Registry.Port - 1)
 
-	//output, err := exec.Command("uptime").CombinedOutput()
-	//output2, err := exec.Command("ping", "toru", "-c", "5").CombinedOutput()
-	//server.RaiseIssue("Found IP", fmt.Sprintf("Found our IP: %v -> %v, %v", server.Registry.Ip, string(output), string(output2)))
-
 	server.Serve()
 }
