@@ -8,8 +8,8 @@ github.com/brotherlogic/discovery v0.0.0-20250613142713-1dac6d7d6bdd h1:jAWLwRrm
 github.com/brotherlogic/discovery v0.0.0-20250613142713-1dac6d7d6bdd/go.mod h1:oJoKVqxSq0aKiXhYRjxPXVqINd+kAQ4xvPjYOC/nPUw=
 github.com/brotherlogic/dstore v0.0.0-20250613140516-5b29ccb83705 h1:+Lnrksnvc3wheOgGTGTuTaztMF7O16iaj0MelOT+BsQ=
 github.com/brotherlogic/dstore v0.0.0-20250613140516-5b29ccb83705/go.mod h1:yH7mg+ci5sUrwWt//fdjgoCW7Elcu9Pvd3u8hlRGfAQ=
-github.com/brotherlogic/frametracker v0.0.0-20250711165835-1d98236cbb83 h1:833BLWbIizohcvsx/n5iL5GMyfp/henBMn+oSgz2lBs=
-github.com/brotherlogic/frametracker v0.0.0-20250711165835-1d98236cbb83/go.mod h1:buIwVf0iQ9gf29IEh/aw2HWaULr5VifL5QIRJC/tjuI=
+github.com/brotherlogic/frametracker v0.0.0-20250711171033-573190b75ef6 h1:y4ruxB97bW96k6pQ6aQtD2Sho5ZmYwSmJG6gl0iBkls=
+github.com/brotherlogic/frametracker v0.0.0-20250711171033-573190b75ef6/go.mod h1:RS8yktZ1cCTKG6pJP7dUahIkEmoyPRsNpL7sPz+Ot/E=
 github.com/brotherlogic/githubcard v0.0.0-20250705001457-90deb6880d6b h1:pNSJb7/yqLY/Y03P6V9z89H7FAZqnbrZtGrc6x3WtJA=
 github.com/brotherlogic/githubcard v0.0.0-20250705001457-90deb6880d6b/go.mod h1:HpCCl15Hz4yhk8DE2K9bFjVcfr/33NeFUw1TA3wwx0A=
 github.com/brotherlogic/githubridge v0.2865.0 h1:PK/nBpIZlEnFd4EurWTfHEjLLTuKejyLivmNJNoBmtc=
